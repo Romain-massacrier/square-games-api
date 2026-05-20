@@ -1,1 +1,4 @@
+com/squaregames/api/HeartbeatController.class
 com/squaregames/api/SquareGamesApiApplication.class
+com/squaregames/api/RandomHeartbeat.class
+com/squaregames/api/HeartbeatSensor.class
