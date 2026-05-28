@@ -1,4 +1,7 @@
-com/squaregames/api/HeartbeatController.class
+com/squaregames/api/game/GameController.class
+com/squaregames/api/config/GameFactoryConfig.class
 com/squaregames/api/SquareGamesApiApplication.class
-com/squaregames/api/RandomHeartbeat.class
-com/squaregames/api/HeartbeatSensor.class
+com/squaregames/api/catalog/GameCatalog.class
+com/squaregames/api/catalog/GameCatalogImpl.class
+com/squaregames/api/catalog/GameCatalogController.class
+com/squaregames/api/game/GameCreationParams.class

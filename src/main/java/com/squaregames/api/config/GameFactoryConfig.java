@@ -1,0 +1,27 @@
+package com.squaregames.api.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import fr.le_campus_numerique.square_games.engine.tictactoe.TicTacToeGameFactory;
+import fr.le_campus_numerique.square_games.engine.connectfour.ConnectFourGameFactory;
+import fr.le_campus_numerique.square_games.engine.taquin.TaquinGameFactory;
+
+@Configuration
+public class GameFactoryConfig {
+
+    @Bean
+    public TicTacToeGameFactory ticTacToeGameFactory() {
+        return new TicTacToeGameFactory();
+    }
+
+    @Bean
+    public ConnectFourGameFactory connectFourGameFactory() {
+        return new ConnectFourGameFactory();
+    }
+
+    @Bean
+    public TaquinGameFactory taquinGameFactory() {
+        return new TaquinGameFactory();
+    }
+}
