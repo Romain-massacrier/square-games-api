@@ -1,9 +1,9 @@
 package com.squaregames.api.catalog;
 
 import java.util.Collection;
+import java.util.Locale;
 
 public interface GameCatalog {
 
-    // Retourne la liste des jeux disponibles
-    Collection<String> getAvailableGames();
+    Collection<GameCatalogItemResponse> getAvailableGames(Locale locale);
 }

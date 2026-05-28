@@ -1,24 +1,28 @@
 package com.squaregames.api.catalog;
 
 import java.util.Collection;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 
-import fr.le_campus_numerique.square_games.engine.GameFactory;
+import com.squaregames.api.game.GamePlugin;
 
 @Service
 public class GameCatalogImpl implements GameCatalog {
 
-    private final Collection<GameFactory> factories;
+    private final Collection<GamePlugin> plugins;
 
-    public GameCatalogImpl(Collection<GameFactory> factories) {
-        this.factories = factories;
+    public GameCatalogImpl(Collection<GamePlugin> plugins) {
+        this.plugins = plugins;
     }
 
     @Override
-    public Collection<String> getAvailableGames() {
-        return factories.stream()
-                .map(GameFactory::getGameFactoryId)
+    public Collection<GameCatalogItemResponse> getAvailableGames(Locale locale) {
+        return plugins.stream()
+                .map(plugin -> new GameCatalogItemResponse(
+                        plugin.getGameType(),
+                        plugin.getName(locale)
+                ))
                 .toList();
     }
 }

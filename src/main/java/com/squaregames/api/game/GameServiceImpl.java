@@ -9,71 +9,67 @@ import org.springframework.stereotype.Service;
 
 import fr.le_campus_numerique.square_games.engine.CellPosition;
 import fr.le_campus_numerique.square_games.engine.Game;
-import fr.le_campus_numerique.square_games.engine.GameFactory;
 import fr.le_campus_numerique.square_games.engine.InvalidPositionException;
 import fr.le_campus_numerique.square_games.engine.Token;
 
 @Service
 public class GameServiceImpl implements GameService {
 
-    private final Map<String, GameFactory> gameFactories;
+    private final Map<String, GamePlugin> gamePlugins;
 
     private final Map<String, Game> games = new HashMap<>();
 
-    public GameServiceImpl(Collection<GameFactory> factories) {
-        this.gameFactories = factories.stream()
+    public GameServiceImpl(Collection<GamePlugin> plugins) {
+        this.gamePlugins = plugins.stream()
                 .collect(Collectors.toMap(
-                        GameFactory::getGameFactoryId,
-                        factory -> factory
+                        GamePlugin::getGameType,
+                        plugin -> plugin
                 ));
     }
 
     @Override
     public GameResponse createGame(GameCreationParams params) {
-        GameFactory gameFactory = gameFactories.get(params.getGameType());
+        GamePlugin plugin = gamePlugins.get(params.getGameType());
 
-        if (gameFactory == null) {
+        if (plugin == null) {
             throw new IllegalArgumentException("Type de jeu inconnu : " + params.getGameType());
         }
 
-        Game game = gameFactory.createGame(
-                params.getPlayerCount(),
-                params.getBoardSize()
-        );
+        Game game = plugin.createGame(params);
 
         String gameId = game.getId().toString();
 
         games.put(gameId, game);
 
         return new GameResponse(
-        gameId,
-        game.getFactoryId(),
-        params.getPlayerCount(),
-        game.getBoardSize(),
-        game.getStatus().toString(),
-        game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
-        game.getBoard().toString()
-);
+                gameId,
+                game.getFactoryId(),
+                game.getPlayerIds().size(),
+                game.getBoardSize(),
+                game.getStatus().toString(),
+                game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
+                game.getBoard().toString()
+        );
     }
 
     @Override
-public GameResponse getGame(String gameId) {
-    Game game = games.get(gameId);
+    public GameResponse getGame(String gameId) {
+        Game game = games.get(gameId);
 
-    if (game == null) {
-        throw new IllegalArgumentException("Aucune partie trouvée avec l'ID : " + gameId);
+        if (game == null) {
+            throw new IllegalArgumentException("Aucune partie trouvée avec l'ID : " + gameId);
+        }
+
+        return new GameResponse(
+                game.getId().toString(),
+                game.getFactoryId(),
+                game.getPlayerIds().size(),
+                game.getBoardSize(),
+                game.getStatus().toString(),
+                game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
+                game.getBoard().toString()
+        );
     }
-
-    return new GameResponse(
-            game.getId().toString(),
-            game.getFactoryId(),
-            game.getPlayerIds().size(),
-            game.getBoardSize(),
-            game.getStatus().toString(),
-            game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
-            game.getBoard().toString()
-    );
-}
 
     @Override
     public String getPossibleMoves(String gameId, String tokenId) {

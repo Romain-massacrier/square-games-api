@@ -2,10 +2,15 @@
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/catalog/GameCatalog.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/catalog/GameCatalogController.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/catalog/GameCatalogImpl.java
+/home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/catalog/GameCatalogItemResponse.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/config/GameFactoryConfig.java
+/home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/ConnectFourPlugin.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/GameController.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/GameCreationParams.java
+/home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/GamePlugin.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/GameResponse.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/GameService.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/GameServiceImpl.java
 /home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/MoveParams.java
+/home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/TaquinPlugin.java
+/home/guest/Bureau/Java Spring/square-games-api/src/main/java/com/squaregames/api/game/TicTacToePlugin.java
