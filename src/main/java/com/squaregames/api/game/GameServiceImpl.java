@@ -1,7 +1,6 @@
 package com.squaregames.api.game;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -17,15 +16,34 @@ public class GameServiceImpl implements GameService {
 
     private final Map<String, GamePlugin> gamePlugins;
 
-    private final Map<String, Game> games = new HashMap<>();
+    private final GameDao gameDao;
 
-    public GameServiceImpl(Collection<GamePlugin> plugins) {
+    public GameServiceImpl(Collection<GamePlugin> plugins, GameDao gameDao) {
         this.gamePlugins = plugins.stream()
                 .collect(Collectors.toMap(
                         GamePlugin::getGameType,
                         plugin -> plugin
                 ));
+
+        this.gameDao = gameDao;
     }
+
+@Override
+public Collection<GameResponse> getAllGames() {
+    return gameDao.findAll()
+            .map(this::toGameResponse)
+            .toList();
+}
+
+@Override
+public void deleteGame(String gameId) {
+    gameDao.findById(gameId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                    "Aucune partie trouvée avec l'ID : " + gameId
+            ));
+
+    gameDao.delete(gameId);
+}
 
     @Override
     public GameResponse createGame(GameCreationParams params) {
@@ -37,47 +55,27 @@ public class GameServiceImpl implements GameService {
 
         Game game = plugin.createGame(params);
 
-        String gameId = game.getId().toString();
+        gameDao.upsert(game);
 
-        games.put(gameId, game);
-
-        return new GameResponse(
-                gameId,
-                game.getFactoryId(),
-                game.getPlayerIds().size(),
-                game.getBoardSize(),
-                game.getStatus().toString(),
-                game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
-                game.getBoard().toString()
-        );
+        return toGameResponse(game);
     }
 
     @Override
     public GameResponse getGame(String gameId) {
-        Game game = games.get(gameId);
+        Game game = gameDao.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucune partie trouvée avec l'ID : " + gameId
+                ));
 
-        if (game == null) {
-            throw new IllegalArgumentException("Aucune partie trouvée avec l'ID : " + gameId);
-        }
-
-        return new GameResponse(
-                game.getId().toString(),
-                game.getFactoryId(),
-                game.getPlayerIds().size(),
-                game.getBoardSize(),
-                game.getStatus().toString(),
-                game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
-                game.getBoard().toString()
-        );
+        return toGameResponse(game);
     }
 
     @Override
     public String getPossibleMoves(String gameId, String tokenId) {
-        Game game = games.get(gameId);
-
-        if (game == null) {
-            return "Aucune partie trouvée avec l'ID : " + gameId;
-        }
+        Game game = gameDao.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucune partie trouvée avec l'ID : " + gameId
+                ));
 
         if (!game.getFactoryId().equals("tictactoe")) {
             return "Les coups possibles ne sont disponibles que pour tictactoe pour le moment.";
@@ -98,11 +96,10 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public String playMove(String gameId, MoveParams params) {
-        Game game = games.get(gameId);
-
-        if (game == null) {
-            return "Aucune partie trouvée avec l'ID : " + gameId;
-        }
+        Game game = gameDao.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucune partie trouvée avec l'ID : " + gameId
+                ));
 
         if (!game.getFactoryId().equals("tictactoe")) {
             return "Seul tictactoe est jouable pour le moment.";
@@ -129,6 +126,8 @@ public class GameServiceImpl implements GameService {
             return "Coup invalide : " + e.getMessage();
         }
 
+        gameDao.upsert(game);
+
         return "Coup joué en x="
                 + params.getTargetx()
                 + ", y="
@@ -137,5 +136,30 @@ public class GameServiceImpl implements GameService {
                 + game.getStatus()
                 + ". Joueur courant : "
                 + game.getCurrentPlayerId();
+    }
+
+    private GameResponse toGameResponse(Game game) {
+        return new GameResponse(
+                game.getId().toString(),
+                game.getFactoryId(),
+                game.getPlayerIds().size(),
+                game.getBoardSize(),
+                game.getStatus().toString(),
+                game.getCurrentPlayerId() == null ? null : game.getCurrentPlayerId().toString(),
+                formatBoard(game)
+        );
+    }
+
+    private String formatBoard(Game game) {
+        return game.getBoard()
+                .entrySet()
+                .stream()
+                .map(entry -> "("
+                        + entry.getKey().x()
+                        + ","
+                        + entry.getKey().y()
+                        + ")="
+                        + entry.getValue().getName())
+                .collect(Collectors.joining(", ", "{", "}"));
     }
 }
